@@ -1,66 +1,59 @@
+import csv
+from models.pitot_measure import PitotMeasureModel
 from tkinter import filedialog
 from lib.csv_parser import CSVParser
-from lib.compute import compute_u_from_delta_p
-from lib.compute import turbulence_intensity_from_u
-from models.pitot_measure import PitotMeasure
-import statistics
-import csv
+from os import path
+from functools import reduce
+
+
+def flatten(listOfLists):
+    return reduce(list.__add__, listOfLists)
+
+
+def transformationPipeline(csv_file_stream, model):
+    # Parse CSV content to get an array of data
+    model_parser = CSVParser(
+        output_model=model.parsing_output_model, separator="\t")
+
+    parsed_model_measures = model_parser.parse(
+        csv_file_stream)
+
+    # Sanitize
+    sanitized_model_measures = model.sanitize(parsed_model_measures)
+
+    # Compute
+    model_computed_measures = model.compute(sanitized_model_measures)
+
+    return model_computed_measures
+
+
+def get_altitude_from_filename(filename):
+    return int(path.basename(filename).replace('U12h', '').replace('.csv', ''))
 
 
 def main(args=None):
     # Open a file selection dialog, restrict to CSV extensions
-    csv_file_stream = filedialog.askopenfile(
-        filetypes=(("CSV files ", "csv {csv}")))
+    csv_file_streams = filedialog.askopenfiles(
+        filetypes=(("csv {csv}", "toto files")))
 
-    # Improvment : Store the altitude
+    # Improvement : Store the altitude
 
-    # Parse CSV content to get an array of data
-    pitot_measure_parser = CSVParser(
-        output_model=PitotMeasure, separator="\t")
+    pipeline_outputs = flatten([
+        transformationPipeline(csv_file_stream, PitotMeasureModel(
+            get_altitude_from_filename(csv_file_stream.name)))
+        for csv_file_stream in csv_file_streams])
 
-    parsed_pitot_measures = pitot_measure_parser.parse(
-        csv_file_stream)
-
-    # Sanitization
-    sanitized_pitot_measures = [
-        (float(t), float(delta_p_ref), float(delta_p_z))
-        for (t, delta_p_ref, delta_p_z) in parsed_pitot_measures
-        if float(delta_p_ref) > float(0) and float(delta_p_z) > float(0)
-    ]
-
-    # Compute u
-    u_measures = [
-        (
-            float(t),
-            compute_u_from_delta_p(delta_p_ref),
-            compute_u_from_delta_p(delta_p_z),
-        )
-        for (t, delta_p_ref, delta_p_z) in sanitized_pitot_measures
-    ]
-
-    # Averaged u
-    # Improvement : call a method from .lib
-    u_ref = [(float(u_ref)) for (t, u_ref, u_z) in u_measures]
-    u_z = [(float(u_z)) for (t, u_ref, u_z) in u_measures]
-    u_ref = [statistics.mean(u_ref), statistics.stdev(u_ref)]
-    u_z = [statistics.mean(u_z), statistics.stdev(u_z)]
-    turbulence = (
-        float(turbulence_intensity_from_u(average_u_z, stdev_u_z))
-        for (average_u_z, stdev_u_z) in u_z
-    )
-
-    # Improvment : store the results in a tab for each altitude
-    print(f"u_ref {u_ref}")
-    print(f"u_z {u_z}")
-    print(f"turbulence_intensity {turbulence}")
+    print(f"pipeline_outputs : {pipeline_outputs}")
+    # Improvement : store the results in a tab for each altitude
 
     # Exploit result, create csv result file
     # Improvement : create a unique csv result file for all altitude with
     # averaged, stdev and turbulence values
     with open("results_u.csv", "w", newline="") as result_file:
-        result_writer = csv.writer(result_file, delimiter=" ")
-        for u_measure in u_measures:
-            result_writer.writerow(list(u_measure))
+        result_writer = csv.writer(result_file)
+        result_writer.writerow(list(pipeline_outputs[0]._fields))
+        for row in pipeline_outputs:
+            result_writer.writerow(list(row))
 
 
 if __name__ == "__main__":

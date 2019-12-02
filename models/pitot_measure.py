@@ -1,4 +1,53 @@
 from collections import namedtuple
+from lib.compute import (compute_u_from_delta_p, compute_average_and_stdev,
+                         turbulence_intensity_from_u)
 
 
 PitotMeasure = namedtuple('PitotMeasure', ['t', 'delta_p_ref', 'delta_p_z'])
+WindProperties = namedtuple('WindProperties', [
+    'z',
+    'u_ref_average',
+    'u_ref_stdev',
+    'u_z_average',
+    'u_z_stdev',
+    'turbulence_intensity'
+])
+
+
+def sanitize_pitot_measures(pitot_measures):
+    return [
+        (float(t), float(delta_p_ref), float(delta_p_z))
+        for (t, delta_p_ref, delta_p_z) in pitot_measures
+        if float(delta_p_ref) > 0 and float(delta_p_z) > 0
+    ]
+
+
+def compute_pitot_measures(pitot_measures, z):
+    u_measures = [
+        (
+            float(t),
+            compute_u_from_delta_p(delta_p_ref),
+            compute_u_from_delta_p(delta_p_z),
+        )
+        for (t, delta_p_ref, delta_p_z) in pitot_measures]
+
+    (u_ref_average, u_ref_stdev) = compute_average_and_stdev(
+        [float(u_ref) for (_, u_ref, _) in u_measures])
+    (u_z_average, u_z_stdev) = compute_average_and_stdev(
+        [float(u_z) for (_, _, u_z) in u_measures])
+    turbulence_intensity = turbulence_intensity_from_u(u_z_average, u_z_stdev)
+
+    return [WindProperties(z, u_ref_average, u_ref_stdev, u_z_average,
+                           u_z_stdev, turbulence_intensity)]
+
+
+class PitotMeasureModel:
+    def __init__(self, z):
+        # interface model
+        self.parsing_output_model = PitotMeasure
+        self.sanitize = sanitize_pitot_measures
+        self.compute = lambda measures: compute_pitot_measures(
+            measures, z)
+
+        # specific PitotMeasureModel fields
+        self.z = z
