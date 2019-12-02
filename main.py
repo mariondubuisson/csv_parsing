@@ -12,8 +12,11 @@ def main(args=None):
         filetypes=(("CSV files ", "csv {csv}")))
 
     # Parse CSV content to get an array of data
-    pitot_measure_parser = CSVParser(output_model=PitotMeasure, separator=' ')
+    pitot_measure_parser = CSVParser(output_model=PitotMeasure, separator='\t')
     parsed_pitot_measures = pitot_measure_parser.parse(csv_file_stream)
+
+    # Sanitization
+    
 
     # Compute u
     u_measures = [(float(t), compute_u_from_delta_p(delta_p_ref), compute_u_from_delta_p(delta_p_z))
