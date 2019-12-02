@@ -14,3 +14,9 @@ This small project take a CSV file as input, parse it, perform computations and 
 # Tests
 Project use `nose` to run the tests. Just do:
 - `nosetests` from project root.
+
+# Todo
+- [ ] Add function to average and stdev in `lib.compute`
+- [ ] Get filename on file upload
+- [ ] Parse filename to extract altitude and store it in a variable
+- [ ] In the end export a result csv with average and stdev by altitude
