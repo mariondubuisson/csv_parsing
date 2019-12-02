@@ -16,11 +16,14 @@ def main(args=None):
     parsed_pitot_measures = pitot_measure_parser.parse(csv_file_stream)
 
     # Sanitization
+    sanitized_pitot_measures = [(float(t), float(delta_p_ref), float(delta_p_z)) 
+                                for (t, delta_p_ref, delta_p_z) in parsed_pitot_measures
+                                if float(delta_p_ref) > float(0)
+                                    and float(delta_p_z) > float (0)]
     
-
     # Compute u
     u_measures = [(float(t), compute_u_from_delta_p(delta_p_ref), compute_u_from_delta_p(delta_p_z))
-                  for (t, delta_p_ref, delta_p_z) in parsed_pitot_measures]
+                  for (t, delta_p_ref, delta_p_z) in sanitized_pitot_measures]
 
     # Exploit result, create csv result file
     with open('results.csv', 'w', newline='') as result_file:
