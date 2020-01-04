@@ -8,6 +8,10 @@ This small project take a CSV file as input, parse it, perform computations and 
 **Install dependencies:**
 - Run `python3 -m pip install -r requirements.txt` from project root.
 
+**Previous verifications**
+- be sure the csv separator is a tab or change the separator parameter in line 16 of main.py
+- be sure each input csv files name is "U10h" and the altitude of the measure or change it on line 31 of main.py 
+
 **Launch the program:**
 - Run `python3 main.py` from project root.
 
@@ -16,7 +20,4 @@ Project use `nose` to run the tests. Just do:
 - `nosetests` from project root.
 
 # Todo
-- [ ] Add function to average and stdev in `lib.compute`
-- [ ] Get filename on file upload
-- [ ] Parse filename to extract altitude and store it in a variable
-- [ ] In the end export a result csv with average and stdev by altitude
+- [ ] Choose folder and filename of the export csv file

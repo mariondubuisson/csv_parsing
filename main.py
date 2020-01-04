@@ -28,7 +28,7 @@ def transformationPipeline(csv_file_stream, model):
 
 
 def get_altitude_from_filename(filename):
-    return int(path.basename(filename).replace('U12h', '').replace('.csv', ''))
+    return int(path.basename(filename).replace('U10h', '').replace('.csv', ''))
 
 
 def main(args=None):
@@ -36,20 +36,16 @@ def main(args=None):
     csv_file_streams = filedialog.askopenfiles(
         filetypes=(("csv {csv}", "toto files")))
 
-    # Improvement : Store the altitude
-
     pipeline_outputs = flatten([
         transformationPipeline(csv_file_stream, PitotMeasureModel(
             get_altitude_from_filename(csv_file_stream.name)))
         for csv_file_stream in csv_file_streams])
 
-    print(f"pipeline_outputs : {pipeline_outputs}")
-    # Improvement : store the results in a tab for each altitude
+    # print(f"pipeline_outputs : {pipeline_outputs}")
 
     # Exploit result, create csv result file
-    # Improvement : create a unique csv result file for all altitude with
-    # averaged, stdev and turbulence values
-    with open("results_u.csv", "w", newline="") as result_file:
+
+    with open("Gradient_properties.csv", "w", newline="") as result_file:
         result_writer = csv.writer(result_file)
         result_writer.writerow(list(pipeline_outputs[0]._fields))
         for row in pipeline_outputs:
