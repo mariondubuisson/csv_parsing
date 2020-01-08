@@ -16,20 +16,20 @@ WindProperties = namedtuple('WindProperties', [
 ])
 
 
-def sanitize_pitot_measures(pitot_measures):
+def sanitize_pitot_measures(pitot_measures, a_ref, a_z):
     return [
-        (float(t), float(delta_p_ref), float(delta_p_z))
+        (float(t), a_ref*float(delta_p_ref), a_z*float(delta_p_z))
         for (t, delta_p_ref, delta_p_z) in pitot_measures
         if float(delta_p_ref) > 0 and float(delta_p_z) > 0
     ]
 
 
-def compute_pitot_measures(pitot_measures, z):
+def compute_pitot_measures(pitot_measures, rho, k_ref, k_z, z):
     u_measures = [
         (
             float(t),
-            compute_u_from_delta_p(delta_p_ref, 1.225),
-            compute_u_from_delta_p(delta_p_z, 1.225),
+            compute_u_from_delta_p(delta_p_ref, rho)*k_ref,
+            compute_u_from_delta_p(delta_p_z, rho)*k_z,
         )
         for (t, delta_p_ref, delta_p_z) in pitot_measures]
 
@@ -49,12 +49,17 @@ def compute_pitot_measures(pitot_measures, z):
 
 
 class PitotMeasureModel:
-    def __init__(self, z):
+    def __init__(self, a_ref, a_z, rho, k_ref, k_z, z):
         # interface model
         self.parsing_output_model = PitotMeasure
-        self.sanitize = sanitize_pitot_measures
-        self.compute = lambda measures: compute_pitot_measures(
-            measures, z)
+        self.sanitize = lambda measures_to_sanitize: sanitize_pitot_measures(measures_to_sanitize, a_ref, a_z)
+        self.compute = lambda measures_to_compute: compute_pitot_measures(
+            measures_to_compute, rho, k_ref, k_z, z)
 
         # specific PitotMeasureModel fields
+        self.a_ref = a_ref
+        self.a_z = a_z
+        self.rho = rho
+        self.k_ref = k_z
+        self.k_z = k_z
         self.z = z

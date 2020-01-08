@@ -9,6 +9,7 @@ This small project take a CSV file as input, parse it, perform computations and 
 - Run `python3 -m pip install -r requirements.txt` from project root.
 
 **Previous verifications**
+- Verify your program parameters (correction and head Pitot coeff., Rho value) in main.py
 - be sure the csv separator is a tab or change the separator parameter in line 16 of main.py
 - be sure each input csv files name is "U10h" and the altitude of the measure or change it on line 31 of main.py 
 
