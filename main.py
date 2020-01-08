@@ -56,8 +56,7 @@ def get_altitude_from_filename(filename):
 
 def main(args=None):
     # Open a file selection dialog, restrict to CSV extensions
-    csv_file_streams = filedialog.askopenfiles(
-        filetypes=(("csv {csv}", "toto files")))
+    csv_file_streams = filedialog.askopenfiles(filetypes=[('CSV files', '.csv'), ('All files', '*')])
 
     pipeline_outputs = flatten([
         transformation_pipeline(
@@ -73,16 +72,15 @@ def main(args=None):
         )
         for csv_file_stream in csv_file_streams])
 
-    # print(f"pipeline_outputs : {pipeline_outputs}")
-
     # Exploit result, create csv result file
-
-    with open("Gradient_properties.csv", "w", newline="") as result_file:
+    output_file = filedialog.asksaveasfilename(
+        filetypes=[('CSV files', '.csv'), ('All files', '*')],
+        defaultextension='.csv')
+    with open(output_file, "w", newline="") as result_file:
         result_writer = csv.writer(result_file)
         result_writer.writerow(list(pipeline_outputs[0]._fields))
         for row in pipeline_outputs:
             result_writer.writerow(list(row))
-
 
 if __name__ == "__main__":
     main()
