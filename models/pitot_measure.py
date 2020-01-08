@@ -26,8 +26,8 @@ def compute_pitot_measures(pitot_measures, z):
     u_measures = [
         (
             float(t),
-            compute_u_from_delta_p(delta_p_ref),
-            compute_u_from_delta_p(delta_p_z),
+            compute_u_from_delta_p(delta_p_ref, 1.225),
+            compute_u_from_delta_p(delta_p_z, 1.225),
         )
         for (t, delta_p_ref, delta_p_z) in pitot_measures]
 
