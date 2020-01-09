@@ -13,16 +13,16 @@ from functools import reduce
 A_REF = 1
 
 # correction coeff. of the gradient delta P measure
-A_Z = 1
+A_Z = 0.987644543
 
 # Head coeff. of the Pitot reference
-K_REF = 1
+K_REF = 1.029
 
 # Head coeff. of the Pitot reference
 K_Z = 1
 
-# air mass volumic in kg/m³
-RHO = 1.227
+# air density in kg/m³
+RHO = 1.196
 
 #########################################################################
 ##                       END PROGRAM PARAMETERS                        ##
@@ -51,7 +51,7 @@ def transformation_pipeline(csv_file_stream, model):
 
 
 def get_altitude_from_filename(filename):
-    return int(path.basename(filename).replace('u15_h_', '').replace('.csv', ''))
+    return int(path.basename(filename).replace('h', '').replace('_u17', '').replace('.csv', ''))
 
 
 def main(args=None):
