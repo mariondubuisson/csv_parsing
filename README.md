@@ -1,5 +1,6 @@
 # Goal
 This small project take a CSV file as input, parse it, perform computations and export a new CSV file.
+--> Transform DeltaP Pitot measure as wind speed measure
 
 # How to run
 **Requirements:**
@@ -21,4 +22,5 @@ Project use `nose` to run the tests. Just do:
 - `nosetests` from project root.
 
 # Todo
-- [ ] Choose folder and filename of the export csv file
+- [ ] Export the parameters as *.csv fil with the export file
+
