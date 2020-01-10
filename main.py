@@ -1,4 +1,6 @@
 import csv
+import re
+
 from models.pitot_measure import PitotMeasureModel
 from tkinter import filedialog
 from lib.csv_parser import CSVParser
@@ -51,7 +53,16 @@ def transformation_pipeline(csv_file_stream, model):
 
 
 def get_altitude_from_filename(filename):
-    return int(path.basename(filename).replace('h', '').replace('_u17', '').replace('.csv', ''))
+    """Using the CSTB standard naming convention : starts with 'h' or 'H', may contain a 'p'
+    e.g.h27     == 27 cm
+        H10p5   == 10.5 cm
+    """
+    matches = re.search(r'[h|H](\d+)p?(\d*)', filename)
+    altitude = float(matches.group(1))
+    if matches.group(2):  # contains decimal part
+        decimal_part = matches.group(2)
+        altitude += float(decimal_part) / 10 ** len(decimal_part)
+    return altitude
 
 
 def main(args=None):
@@ -81,6 +92,7 @@ def main(args=None):
         result_writer.writerow(list(pipeline_outputs[0]._fields))
         for row in pipeline_outputs:
             result_writer.writerow(list(row))
+
 
 if __name__ == "__main__":
     main()
