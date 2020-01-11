@@ -18,7 +18,7 @@ A_Z = 0.987644543
 # Head coeff. of the Pitot reference
 K_REF = 1.029
 
-# Head coeff. of the Pitot reference
+# Head coeff. of the gradient Pitot
 K_Z = 1
 
 # air density in kg/m³
@@ -51,16 +51,17 @@ def transformation_pipeline(csv_file_stream, model):
 
 
 def get_altitude_from_filename(filename):
-    return int(path.basename(filename).replace('h', '').replace('_u17', '').replace('.csv', ''))
+    return int(path.basename(filename).replace('U10h', '').replace('.csv', ''))
 
 
 def main(args=None):
     # Open a file selection dialog, restrict to CSV extensions
-    csv_file_streams = filedialog.askopenfiles(filetypes=[('CSV files', '.csv'), ('All files', '*')])
+    csv_file_streams = filedialog.askopenfiles(
+        filetypes=[('CSV files', '.csv'), ('All files', '*')])
 
     pipeline_outputs = flatten([
         transformation_pipeline(
-            csv_file_stream, 
+            csv_file_stream,
             PitotMeasureModel(
                 z=get_altitude_from_filename(csv_file_stream.name),
                 a_ref=A_REF,
@@ -78,9 +79,20 @@ def main(args=None):
         defaultextension='.csv')
     with open(output_file, "w", newline="") as result_file:
         result_writer = csv.writer(result_file)
+        result_writer.writerow(['Compute parameters'])
+        result_writer.writerow(
+            ['Correction coeff. of the reference delta P measure', 'a_REF', A_REF])
+        result_writer.writerow(
+            ['correction coeff. of the gradient delta P measure', 'a_Z', A_Z])
+        result_writer.writerow(
+            ['Head coeff. of the Pitot reference', 'k_Z', K_Z])
+        result_writer.writerow(
+            ['Head coeff. of the gradient Pitot', 'k_Z', K_Z])
+        result_writer.writerow(['air density in kg/m3', 'Rho', RHO])
         result_writer.writerow(list(pipeline_outputs[0]._fields))
         for row in pipeline_outputs:
             result_writer.writerow(list(row))
+
 
 if __name__ == "__main__":
     main()

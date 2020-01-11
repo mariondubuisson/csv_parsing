@@ -10,7 +10,7 @@ This small project take a CSV file as input, parse it, perform computations and 
 - Run `python3 -m pip install -r requirements.txt` from project root.
 
 **Previous verifications**
-- Verify your program parameters (correction and head Pitot coeff., Rho value) in main.py
+- Verify your program parameters (corrections on DeltaP mesure, head Pitot coeff. and Rho value) in main.py
 - be sure the csv separator is a tab or change the separator parameter in line 16 of main.py
 - be sure each input csv files name is "U10h" and the altitude of the measure or change it on line 31 of main.py 
 
@@ -22,5 +22,5 @@ Project use `nose` to run the tests. Just do:
 - `nosetests` from project root.
 
 # Todo
-- [ ] Export the parameters as *.csv fil with the export file
+- [ ]
 
