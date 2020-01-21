@@ -51,7 +51,8 @@ def compute_pitot_measures(pitot_measures, rho, k_ref, k_z, z):
 class PitotMeasureModel:
     def __init__(self, a_ref, a_z, rho, k_ref, k_z, z):
         # interface model
-        self.parsing_output_model = PitotMeasure
+        self.parsing_output_model = lambda t, delta_p_ref, delta_p_z: PitotMeasure(
+            t, float(delta_p_ref.replace(',', '.')), float(delta_p_z.replace(',', '.')))
         self.sanitize = lambda measures_to_sanitize: sanitize_pitot_measures(
             measures_to_sanitize, a_ref, a_z)
         self.compute = lambda measures_to_compute: compute_pitot_measures(
