@@ -52,7 +52,8 @@ class PitotMeasureModel:
     def __init__(self, a_ref, a_z, rho, k_ref, k_z, z):
         # interface model
         self.parsing_output_model = PitotMeasure
-        self.sanitize = lambda measures_to_sanitize: sanitize_pitot_measures(measures_to_sanitize, a_ref, a_z)
+        self.sanitize = lambda measures_to_sanitize: sanitize_pitot_measures(
+            measures_to_sanitize, a_ref, a_z)
         self.compute = lambda measures_to_compute: compute_pitot_measures(
             measures_to_compute, rho, k_ref, k_z, z)
 
@@ -60,6 +61,6 @@ class PitotMeasureModel:
         self.a_ref = a_ref
         self.a_z = a_z
         self.rho = rho
-        self.k_ref = k_z
+        self.k_ref = k_ref
         self.k_z = k_z
         self.z = z
