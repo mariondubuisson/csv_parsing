@@ -16,3 +16,7 @@ def turbulence_intensity_from_u(u, stdev_u):
 
 def compute_delta_p_from_u(u, rho):
     return rho*u*u/2
+
+
+def compute_rho(t, hr, p_atmo):
+    return (p_atmo*100-0.378*hr/100*10**(10.202435-(1736.2356/(t+273.15-39.05))))/(287.057*(t+273.15))
