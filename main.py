@@ -4,7 +4,7 @@ from tkinter import filedialog
 from lib.csv_parser import CSVParser
 from os import path
 from functools import reduce
-from lib.Param_gradient import param_from_matlab_file
+# from lib.Param_gradient import param_from_matlab_file
 
 #########################################################################
 ##                          PROGRAM PARAMETERS                         ##

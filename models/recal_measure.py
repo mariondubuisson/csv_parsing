@@ -9,15 +9,15 @@ RecalProperties = namedtuple('RecalProperties', ['u_ref', 'alpha_u'])
 
 
 def compute_recal_measures(recal_measures, k_z):
-    rho = [compute_rho(temperature, hr, p_atmo)
-           for (temperature, hr, p_atmo) in recal_measures]
 
     u_measure = [
         (t,
-         compute_u_from_delta_p(deltaP_ref, rho, 1),
-         compute_u_from_delta_p(deltaP_z, rho, k_z)
+         compute_u_from_delta_p(
+             deltaP_ref, compute_rho(temperature, hr, p_atmo), 1),
+         compute_u_from_delta_p(deltaP_z, compute_rho(
+             temperature, hr, p_atmo), k_z)
          )
-        for (t, deltaP_ref, deltaP_z) in recal_measures
+        for (t, deltaP_z, _, deltaP_ref, temperature, hr, p_atmo) in recal_measures
     ]
 
     (u_ref_average, u_ref_std) = compute_average_and_stdev(
@@ -38,7 +38,7 @@ def convert_raw_str_value_to_float(value):
 class RecalMeasureModel:
     def __init__(self, k_z, name):
         # interface model
-        self.parsing_outpout_model = lambda t, deltaP_z, deltaP_rap, deltaP_ref, temp, hr, p_atmo: RecalMeasures(convert_raw_str_value_to_float(t), convert_raw_str_value_to_float(deltaP_z), convert_raw_str_value_to_float(
+        self.parsing_output_model = lambda t, deltaP_z, deltaP_rap, deltaP_ref, temp, hr, p_atmo: RecalMeasures(convert_raw_str_value_to_float(t), convert_raw_str_value_to_float(deltaP_z), convert_raw_str_value_to_float(
             deltaP_rap), convert_raw_str_value_to_float(deltaP_ref), convert_raw_str_value_to_float(temp), convert_raw_str_value_to_float(hr), convert_raw_str_value_to_float(p_atmo))
 
         self.compute = lambda measures_to_compute: compute_recal_measures(

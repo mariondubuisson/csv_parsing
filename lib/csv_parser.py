@@ -25,13 +25,13 @@ class CSVParser:
 
     def parse(self, csv_content):
         parsing_result = []
-        for index, row in enumerate(csv.reader(csv_content, delimiter=self.separator)):
+        for index, row in enumerate(csv.reader(csv_content, delimiter=self.separator, )):
             # don't parse column name if option is set
             if index == 0 and self.skip_column_name:
                 continue
 
             try:
-                parsing_result.append(self.output_model(*row))
+                parsing_result.append(self.output_model(*row[:-1]))
             except TypeError:
                 raise CSVParserOutputModelUnmatchException(
                     row, index) from None
