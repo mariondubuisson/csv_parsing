@@ -1,5 +1,5 @@
 import csv
-from models.pitot_measure import PitotMeasureModel
+from models.recal_measure import RecalMeasureModel
 from tkinter import filedialog
 from lib.csv_parser import CSVParser
 from os import path
@@ -59,7 +59,7 @@ def transformation_pipeline(csv_file_stream, model):
     return model_computed_measures
 
 
-def get_altitude_from_filename(filename):
+# def get_altitude_from_filename(filename):
     return int(path.basename(filename).replace(prefix, '').replace(extension, ''))
 
 
@@ -71,12 +71,7 @@ def main(args=None):
     pipeline_real_outputs = flatten([
         transformation_pipeline(
             csv_file_stream,
-            PitotMeasureModel(
-                z=get_altitude_from_filename(csv_file_stream.name),
-                a_ref=A_REF,
-                a_z=A_Z,
-                rho=STD_RHO,
-                k_ref=K_REF,
+            RecalMeasureModel(
                 k_z=K_Z
             )
         )
