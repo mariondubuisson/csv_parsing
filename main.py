@@ -31,7 +31,7 @@ STD_RHO = 1.225
 # Files parameters
 #place = r"\\zc-NSA1\etudes\Cité musicale\250eme\gradient-vertical\SIMUL2_Fil40Hz_OK\param_gradient.mat"
 prefix = 'CP55%_IIIB_cmh'
-extension = '.csv'
+extension = '.dat'
 
 #########################################################################
 ##                       END PROGRAM PARAMETERS                        ##
@@ -50,23 +50,20 @@ def transformation_pipeline(csv_file_stream, model):
     parsed_model_measures = model_parser.parse(
         csv_file_stream)
 
-    # Sanitize
-    sanitized_model_measures = model.sanitize(parsed_model_measures)
-
     # Compute
-    model_computed_measures = model.compute(sanitized_model_measures)
+    model_computed_measures = model.compute(parsed_model_measures)
 
     return model_computed_measures
 
 
 # def get_altitude_from_filename(filename):
-    return int(path.basename(filename).replace(prefix, '').replace(extension, ''))
+    # return int(path.basename(filename).replace(prefix, '').replace(extension, ''))
 
 
 def main(args=None):
     # Open a file selection dialog, restrict to CSV extensions
     csv_file_streams = filedialog.askopenfiles(
-        filetypes=[('CSV files', '.csv'), ('All files', '*')])
+        filetypes=[('CSV files', '.csv'), ('Data files', '.dat'), ('All files', '*')])
 
     pipeline_real_outputs = flatten([
         transformation_pipeline(
