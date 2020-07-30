@@ -22,15 +22,9 @@ K_REF = 1
 # Head coeff. of the gradient Pitot
 K_Z = 1
 
-# Real air density in kg/m³
-RHO = 1.18
-
-# Std air density in kg/m³
-STD_RHO = 1.225
 
 # Files parameters
-#place = r"\\zc-NSA1\etudes\Cité musicale\250eme\gradient-vertical\SIMUL2_Fil40Hz_OK\param_gradient.mat"
-prefix = 'CP55%_IIIB_cmh'
+prefix = 'XXX'
 extension = '.dat'
 
 #########################################################################
@@ -56,8 +50,8 @@ def transformation_pipeline(csv_file_stream, model):
     return model_computed_measures
 
 
-# def get_altitude_from_filename(filename):
-    # return int(path.basename(filename).replace(prefix, '').replace(extension, ''))
+def get_filename(filename):
+    return str(path.basename(filename).replace(prefix, '').replace(extension, ''))
 
 
 def main(args=None):
@@ -69,12 +63,11 @@ def main(args=None):
         transformation_pipeline(
             csv_file_stream,
             RecalMeasureModel(
-                k_z=K_Z
+                k_z=K_Z,
+                name=get_filename(csv_file_stream.name)
             )
         )
         for csv_file_stream in csv_file_streams])
-
-    #Gradient_parameters = param_from_matlab_file(place)
 
     # Exploit result, create csv result file
     output_file = filedialog.asksaveasfilename(
@@ -91,15 +84,7 @@ def main(args=None):
             ['Head coeff. of the Pitot reference', 'k_ref', K_REF])
         result_writer.writerow(
             ['Head coeff. of the gradient Pitot', 'k_Z', K_Z])
-        result_writer.writerow(['air density in kg/m3', 'Rho', RHO])
-        result_writer.writerow(
-            ['Standard air density in kg/m3', 'Std Rho', STD_RHO])
-        # result_writer.writerow(['Reference height of the model',
-        #                         'href', [g.href for g in Gradient_parameters]])
-        # result_writer.writerow(
-        #     ['Scale of the model', 'scale', [g.echelle for g in Gradient_parameters]])
-        # result_writer.writerow(
-        #     ['Rugosity', 'rugo', [g.rugo for g in Gradient_parameters]])
+
         result_writer.writerow(list(pipeline_real_outputs[0]._fields))
         for row in pipeline_real_outputs:
             result_writer.writerow(list(row))

@@ -2,10 +2,10 @@ from collections import namedtuple
 from lib.compute import (compute_u_from_delta_p,
                          compute_rho, compute_average_and_stdev)
 
-RecalMeasures = namedtuple('recal_measures', [
-                           't', 'deltaP_z', 'deltaP_rap', 'deltaP_ref', 'temperature', 'hr', 'p_atmo', ])
+RecalMeasures = namedtuple('RecalMeasures', [
+                           't', 'deltaP_z', 'deltaP_rap', 'deltaP_ref', 'temp', 'hr', 'p_atmo', ])
 
-RecalProperties = namedtuple('recal_properties', ['u_ref', 'alpha_u'])
+RecalProperties = namedtuple('RecalProperties', ['u_ref', 'alpha_u'])
 
 
 def compute_recal_measures(recal_measures, k_z):
@@ -31,15 +31,15 @@ def compute_recal_measures(recal_measures, k_z):
     return [RecalProperties(u_ref_average, alpha_u)]
 
 
-def convert_raw_str_value_to_float(str):
-    return float(str)
+def convert_raw_str_value_to_float(value):
+    return float(value)
 
 
 class RecalMeasureModel:
-    def __init__(self, k_z):
+    def __init__(self, k_z, name):
         # interface model
-        self.parsing_outpout_model = lambda t, deltaP_z, deltaP_ref, temperature, hr, p_atmo: RecalMeasures(convert_raw_str_value_to_float(t), convert_raw_str_value_to_float(
-            deltaP_z), convert_raw_str_value_to_float(deltaP_ref), convert_raw_str_value_to_float(temperature), convert_raw_str_value_to_float(hr), convert_raw_str_value_to_float(p_atmo))
+        self.parsing_outpout_model = lambda t, deltaP_z, deltaP_rap, deltaP_ref, temp, hr, p_atmo: RecalMeasures(convert_raw_str_value_to_float(t), convert_raw_str_value_to_float(deltaP_z), convert_raw_str_value_to_float(
+            deltaP_rap), convert_raw_str_value_to_float(deltaP_ref), convert_raw_str_value_to_float(temp), convert_raw_str_value_to_float(hr), convert_raw_str_value_to_float(p_atmo))
 
         self.compute = lambda measures_to_compute: compute_recal_measures(
             measures_to_compute, k_z)
@@ -47,3 +47,4 @@ class RecalMeasureModel:
         # specific RecalMeasureModel fields
 
         self.k_z = k_z
+        self.name = name
