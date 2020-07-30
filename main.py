@@ -29,8 +29,8 @@ RHO = 1.18
 STD_RHO = 1.225
 
 # Files parameters
-place = r"\\zc-NSA1\etudes\Cité musicale\250eme\gradient-vertical\SIMUL2_Fil40Hz_OK\param_gradient.mat"
-prefix = 'S2-Pales50pc_cmH'
+#place = r"\\zc-NSA1\etudes\Cité musicale\250eme\gradient-vertical\SIMUL2_Fil40Hz_OK\param_gradient.mat"
+prefix = 'CP55%_IIIB_cmh'
 extension = '.csv'
 
 #########################################################################
@@ -82,7 +82,7 @@ def main(args=None):
         )
         for csv_file_stream in csv_file_streams])
 
-    Gradient_parameters = param_from_matlab_file(place)
+    #Gradient_parameters = param_from_matlab_file(place)
 
     # Exploit result, create csv result file
     output_file = filedialog.asksaveasfilename(
@@ -102,12 +102,12 @@ def main(args=None):
         result_writer.writerow(['air density in kg/m3', 'Rho', RHO])
         result_writer.writerow(
             ['Standard air density in kg/m3', 'Std Rho', STD_RHO])
-        result_writer.writerow(['Reference height of the model',
-                                'href', [g.href for g in Gradient_parameters]])
-        result_writer.writerow(
-            ['Scale of the model', 'scale', [g.echelle for g in Gradient_parameters]])
-        result_writer.writerow(
-            ['Rugosity', 'rugo', [g.rugo for g in Gradient_parameters]])
+        # result_writer.writerow(['Reference height of the model',
+        #                         'href', [g.href for g in Gradient_parameters]])
+        # result_writer.writerow(
+        #     ['Scale of the model', 'scale', [g.echelle for g in Gradient_parameters]])
+        # result_writer.writerow(
+        #     ['Rugosity', 'rugo', [g.rugo for g in Gradient_parameters]])
         result_writer.writerow(list(pipeline_real_outputs[0]._fields))
         for row in pipeline_real_outputs:
             result_writer.writerow(list(row))

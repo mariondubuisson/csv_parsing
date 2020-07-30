@@ -27,7 +27,7 @@ def compute_wind_measures(wind_measures, rho, k_ref):
         (
             t,
             p_ref,
-            compute_u_from_delta_p(p_ref, rho)*k_ref,
+            compute_u_from_delta_p(p_ref, rho, k_ref),
             compute_delta_p_from_u(u_gil, rho),
             u_gil,
         )
