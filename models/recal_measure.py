@@ -1,7 +1,7 @@
 from collections import namedtuple
 from lib.compute import (compute_rho_with_uncertaintes,
                          compute_u_with_uncertainties, compute_average_and_stdev)
-from uncertainties import ufloat
+from uncertainties import (ufloat, umath)
 
 RecalMeasures = namedtuple('RecalMeasures', [
                            't', 'deltaP_z', 'deltaP_rap', 'deltaP_ref', 'temp', 'hr', 'p_atmo', ])
@@ -31,17 +31,22 @@ def compute_recal_measures(name, recal_measures, k_z):
         for (t, deltaP_ref, deltaP_z, rho) in measure_with_uncertainties
     ]
 
-    print(u_measure)
-
     (u_ref_average, u_ref_std) = compute_average_and_stdev(
-        [float(u_ref) for (_, u_ref, _) in u_measure])
+        [ufloat(u_ref.n, u_ref.s) for (_, u_ref, _) in u_measure])
 
     (u_z_average, u_z_std) = compute_average_and_stdev(
-        [float(u_z) for (_, _, u_z) in u_measure])
+        [ufloat(u_z.n, u_z.s) for (_, _, u_z) in u_measure])
 
-    alpha_u_average = u_z_average / u_ref_average
+    u_ref_compiled = [
+        ufloat(u_ref_average, umath.sqrt(u_ref_std**2+u_ref.s)) for (_, u_ref, _) in u_measure
+    ]
+    u_z_compiled = [
+        ufloat(u_z_average, umath.sqrt(u_z_std**2+u_ref.s)) for (_, _, u_z) in u_measure
+    ]
+    alpha_u = u_z_compiled / u_ref_compiled
+    print(alpha_u)
 
-    return [RecalProperties(name, u_ref_average, alpha_u_average)]
+    return [RecalProperties(name, u_ref_average, alpha_u)]
 
 
 def convert_raw_str_value_to_float(value):

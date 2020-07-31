@@ -1,0 +1,12 @@
+Compute parameters
+Correction coeff. of the reference delta P measure,a_REF,1
+correction coeff. of the gradient delta P measure,a_Z,1
+uncertaintie slope of gradient delta P measure,a_u_deltaP_Z,0.00051
+uncertaintie y-intercept of gradient delta P measure,b_u_deltaP_Z,0.555
+Head coeff. of the Pitot reference,k_ref,1
+Head coeff. of the gradient Pitot,k_Z,1.035
+uncertaintie of the coeff. of the gradient Pitot,u_k_Z,0.005
+filename,u_ref,alpha_u
+2020_07_22_U_4.8_0deg,4.681828091835617,1.1203502356859594
+2020_07_22_U_4.8_0deg_2,4.821368895828609,1.0395292685613597
+2020_07_22_U_4.8_90deg,4.841935846716729,0.985218999181747

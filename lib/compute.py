@@ -12,7 +12,7 @@ def compute_u_from_delta_p(delta_p, rho, k):
 
 
 def compute_u_with_uncertainties(delta_p, rho, k):
-    return ufloat(k.n, k.s) * umath.sqrt(ufloat(delta_p.n, delta_p.s) * 2 / ufloat(rho.n, rho.s))
+    return k * umath.sqrt(delta_p * 2 / rho)
 
 
 def turbulence_intensity_from_u(u, stdev_u):
