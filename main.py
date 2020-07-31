@@ -16,11 +16,18 @@ A_REF = 1
 # correction coeff. of the gradient delta P measure
 A_Z = 1
 
+# std of the gradient deltaP measure
+A_U_Z = 1.02E-3/2
+B_U_Z = 1.11/2
+
 # Head coeff. of the Pitot reference
 K_REF = 1
 
 # Head coeff. of the gradient Pitot
 K_Z = 1.035
+
+# std of the head coeff. of the gradient Pitot
+U_K_Z = 0.01/2
 
 
 # Files parameters
@@ -36,7 +43,12 @@ def flatten(listOfLists):
     return reduce(list.__add__, listOfLists)
 
 
+def get_filename(file):
+    return str(path.basename(file).replace(extension, ''))
+
+
 def transformation_pipeline(csv_file_stream, model):
+
     # Parse CSV content to get an array of data
     model_parser = CSVParser(
         output_model=model.parsing_output_model, separator="\t")
@@ -50,12 +62,8 @@ def transformation_pipeline(csv_file_stream, model):
     return model_computed_measures
 
 
-def get_filename(filename):
-    return str(path.basename(filename).replace(prefix, '').replace(extension, ''))
-
-
 def main(args=None):
-    # Open a file selection dialog, restrict to CSV extensions
+    # Open a file selection dialog, restrict to different extensions
     csv_file_streams = filedialog.askopenfiles(
         filetypes=[('CSV files', '.csv'), ('Data files', '.dat'), ('All files', '*')])
 
@@ -81,9 +89,15 @@ def main(args=None):
         result_writer.writerow(
             ['correction coeff. of the gradient delta P measure', 'a_Z', A_Z])
         result_writer.writerow(
+            ['uncertaintie slope of gradient delta P measure', 'a_u_deltaP_Z', A_U_Z])
+        result_writer.writerow(
+            ['uncertaintie y-intercept of gradient delta P measure', 'b_u_deltaP_Z', B_U_Z])
+        result_writer.writerow(
             ['Head coeff. of the Pitot reference', 'k_ref', K_REF])
         result_writer.writerow(
             ['Head coeff. of the gradient Pitot', 'k_Z', K_Z])
+        result_writer.writerow(
+            ['uncertaintie of the coeff. of the gradient Pitot', 'u_k_Z', U_K_Z])
 
         result_writer.writerow(list(pipeline_real_outputs[0]._fields))
         for row in pipeline_real_outputs:
