@@ -31,7 +31,7 @@ class CSVParser:
                 continue
 
             try:
-                parsing_result.append(self.output_model(*row[:-1]))
+                parsing_result.append(self.output_model(*row[:-3]))
             except TypeError:
                 raise CSVParserOutputModelUnmatchException(
                     row, index) from None

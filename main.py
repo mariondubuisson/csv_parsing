@@ -20,7 +20,7 @@ A_Z = 1
 K_REF = 1
 
 # Head coeff. of the gradient Pitot
-K_Z = 1
+K_Z = 1.035
 
 
 # Files parameters
