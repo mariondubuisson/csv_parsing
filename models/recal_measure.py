@@ -1,6 +1,6 @@
 from collections import namedtuple
-from lib.compute import (compute_u_from_delta_p,
-                         compute_rho, compute_average_and_stdev)
+from lib.compute import (compute_rho_with_uncertaintes,
+                         compute_u_with_uncertainties, compute_average_and_stdev)
 from uncertainties import ufloat
 
 RecalMeasures = namedtuple('RecalMeasures', [
@@ -12,13 +12,26 @@ RecalProperties = namedtuple(
 
 def compute_recal_measures(name, recal_measures, k_z):
 
-    u_measure = [
-        (t, compute_u_from_delta_p(deltaP_ref, compute_rho(temperature, hr, p_atmo), 1),
-         compute_u_from_delta_p(deltaP_z, compute_rho(
-             temperature, hr, p_atmo), k_z)
-         )
+    measure_with_uncertainties = [
+        (
+            t,
+            ufloat(deltaP_ref, 0),
+            ufloat(deltaP_z, 4),
+            compute_rho_with_uncertaintes(
+                temperature, hr, p_atmo, 1.74, 0.86, 86)
+        )
         for (t, deltaP_z, _, deltaP_ref, temperature, hr, p_atmo) in recal_measures
     ]
+
+    u_measure = [
+        (t, compute_u_with_uncertainties(ufloat(deltaP_ref.n, deltaP_ref.s), ufloat(rho.n, rho.s), ufloat(1, 0)),
+         compute_u_with_uncertainties(
+            ufloat(deltaP_z.n, deltaP_z.s), ufloat(rho.n, rho.s), ufloat(k_z, 0.01))
+         )
+        for (t, deltaP_ref, deltaP_z, rho) in measure_with_uncertainties
+    ]
+
+    print(u_measure)
 
     (u_ref_average, u_ref_std) = compute_average_and_stdev(
         [float(u_ref) for (_, u_ref, _) in u_measure])
