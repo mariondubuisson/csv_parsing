@@ -173,7 +173,6 @@ for p=1:1:noofchan,
     chaninfo.linmode=fread(fid,1,'char');           % Linearization Mode
     chaninfo.userscale=fread(fid,1,'char');
     npoi=fread(fid,1,'char');                       % Number of points for user scale lin.
-    fread(fid,[1,npoi],'double');                   % The points
     fread(fid,1,'short');                           % Thermo Type
     Lf=fread(fid,1,'short');                        % Length of formula
     if Lf>0,
