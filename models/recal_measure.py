@@ -1,7 +1,10 @@
+import numpy as np
+
 from collections import namedtuple
 from lib.compute import (compute_rho_with_uncertaintes,
                          compute_u_with_uncertainties, compute_average_and_stdev)
-from uncertainties import (ufloat, umath)
+from uncertainties import (ufloat, unumpy)
+
 
 RecalMeasures = namedtuple('RecalMeasures', [
                            't', 'deltaP_z', 'deltaP_rap', 'deltaP_ref', 'temp', 'hr', 'p_atmo', ])
@@ -12,39 +15,33 @@ RecalProperties = namedtuple(
 
 def compute_recal_measures(name, recal_measures, k_z):
 
-    measure_with_uncertainties = [
+    measures_with_uncertainties = [
         (
             t,
-            ufloat(deltaP_ref, 0),
-            ufloat(deltaP_z, 4),
+            ufloat(deltaP_ref, 0, 'deltaP_ref'),
+            ufloat(deltaP_z, 4, 'deltaP_z'),
             compute_rho_with_uncertaintes(
                 temperature, hr, p_atmo, 1.74, 0.86, 86)
         )
         for (t, deltaP_z, _, deltaP_ref, temperature, hr, p_atmo) in recal_measures
     ]
 
-    u_measure = [
+    u_measures = [
         (t, compute_u_with_uncertainties(ufloat(deltaP_ref.n, deltaP_ref.s), ufloat(rho.n, rho.s), ufloat(1, 0)),
          compute_u_with_uncertainties(
             ufloat(deltaP_z.n, deltaP_z.s), ufloat(rho.n, rho.s), ufloat(k_z, 0.01))
          )
-        for (t, deltaP_ref, deltaP_z, rho) in measure_with_uncertainties
+        for (t, deltaP_ref, deltaP_z, rho) in measures_with_uncertainties
     ]
 
-    (u_ref_average, u_ref_std) = compute_average_and_stdev(
-        [ufloat(u_ref.n, u_ref.s) for (_, u_ref, _) in u_measure])
+    u_ref_average = np.mean(unumpy.nominal_values(
+        [u_ref for (_, u_ref, _) in u_measures]))
 
-    (u_z_average, u_z_std) = compute_average_and_stdev(
-        [ufloat(u_z.n, u_z.s) for (_, _, u_z) in u_measure])
+    u_z_average = np.mean(unumpy.nominal_values(
+        [u_z for (_, _, u_z) in u_measures]))
 
-    u_ref_compiled = [
-        ufloat(u_ref_average, umath.sqrt(u_ref_std**2+u_ref.s)) for (_, u_ref, _) in u_measure
-    ]
-    u_z_compiled = [
-        ufloat(u_z_average, umath.sqrt(u_z_std**2+u_ref.s)) for (_, _, u_z) in u_measure
-    ]
-    alpha_u = u_z_compiled / u_ref_compiled
-    print(alpha_u)
+    alpha_u = u_z_average / u_ref_average
+    print('alpha_u = ', alpha_u)
 
     return [RecalProperties(name, u_ref_average, alpha_u)]
 
