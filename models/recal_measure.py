@@ -10,10 +10,12 @@ RecalMeasures = namedtuple('RecalMeasures', [
                            't', 'deltaP_z', 'deltaP_rap', 'deltaP_ref', 'temp', 'hr', 'p_atmo', ])
 
 RecalProperties = namedtuple(
-    'RecalProperties', ['filename', 'u_ref', 'alpha_u'])
+    'RecalProperties', ['filename', 'u_ref', 'alpha_u', 'alpha_u_std'])
 
 
 def compute_recal_measures(name, recal_measures, k_z):
+
+    # Transform raw measurements in deltaP ref, deltaP z and rho ufloats (with uncertainties)
 
     measures_with_uncertainties = [
         (
@@ -26,6 +28,8 @@ def compute_recal_measures(name, recal_measures, k_z):
         for (t, deltaP_z, _, deltaP_ref, temperature, hr, p_atmo) in recal_measures
     ]
 
+    # Transform ufloats deltaP measurements into speed measurements (with uncertainties)
+
     u_measures = [
         (t, compute_u_with_uncertainties(ufloat(deltaP_ref.n, deltaP_ref.s), ufloat(rho.n, rho.s), ufloat(1, 0)),
          compute_u_with_uncertainties(
@@ -37,13 +41,17 @@ def compute_recal_measures(name, recal_measures, k_z):
     u_ref_average = np.mean(unumpy.nominal_values(
         [u_ref for (_, u_ref, _) in u_measures]))
 
-    u_z_average = np.mean(unumpy.nominal_values(
-        [u_z for (_, _, u_z) in u_measures]))
+    # Compute the alpha coefficient in speed, for each measure
 
-    alpha_u = u_z_average / u_ref_average
-    print('alpha_u = ', alpha_u)
+    alpha_u = [u_z / u_ref for (_, u_ref, u_z) in u_measures]
 
-    return [RecalProperties(name, u_ref_average, alpha_u)]
+    # Compute alpha average avec std, combination of alpha std of each measure average and std deviation of the alpha coefficient
+
+    alpha_u_average = np.mean(unumpy.nominal_values(alpha_u))
+    alpha_u_std = (np.std(unumpy.nominal_values(alpha_u))**2 +
+                   np.mean(unumpy.std_devs(alpha_u))**2)**0.5
+
+    return [RecalProperties(name, u_ref_average, alpha_u_average, alpha_u_std)]
 
 
 def convert_raw_str_value_to_float(value):
