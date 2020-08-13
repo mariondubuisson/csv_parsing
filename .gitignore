@@ -1,3 +1,6 @@
 __pycache__
 .DS_Store
 .vscode/settings.json
+test_samples/recal.csv
+test_samples/test_2.csv
+test_samples/test.csv
