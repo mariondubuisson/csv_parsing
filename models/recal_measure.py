@@ -10,10 +10,10 @@ RecalMeasures = namedtuple('RecalMeasures', [
                            't', 'deltaP_z', 'deltaP_rap', 'deltaP_ref', 'temp', 'hr', 'p_atmo', ])
 
 RecalProperties = namedtuple(
-    'RecalProperties', ['filename', 'u_ref', 'alpha_u_ref', 'alpha_u_ref_std', 'alpha_u_rap', 'aalpha_u_rap_std'])
+    'RecalProperties', ['filename', 'u_ref', 'alpha_u_ref', 'alpha_u_ref_std', 'alpha_u_rap', 'alpha_u_rap_std'])
 
 
-def compute_recal_measures(name, recal_measures, k_z):
+def compute_recal_measures(name, recal_measures, k_z, u_k_z, a_u_z, b_u_z):
 
     # Transform raw measurements in deltaP ref, deltaP z and rho ufloats (with uncertainties)
 
@@ -22,7 +22,7 @@ def compute_recal_measures(name, recal_measures, k_z):
             t,
             ufloat(deltaP_ref, 0, 'deltaP_ref'),
             ufloat(deltaP_rap, 0, 'deltaP_rap'),
-            ufloat(deltaP_z, 4, 'deltaP_z'),
+            ufloat(deltaP_z, a_u_z * deltaP_z + b_u_z, 'deltaP_z'),
             compute_rho_with_uncertaintes(
                 temperature, hr, p_atmo, 1.74, 0.86, 86)
         )
@@ -36,7 +36,7 @@ def compute_recal_measures(name, recal_measures, k_z):
          compute_u_with_uncertainties(
              ufloat(deltaP_rap.n, deltaP_rap.s), ufloat(rho.n, rho.s), ufloat(1, 0)),
          compute_u_with_uncertainties(
-            ufloat(deltaP_z.n, deltaP_z.s), ufloat(rho.n, rho.s), ufloat(k_z, 0.01))
+            ufloat(deltaP_z.n, deltaP_z.s), ufloat(rho.n, rho.s), ufloat(k_z, u_k_z))
          )
         for (t, deltaP_ref, deltaP_rap, deltaP_z, rho) in measures_with_uncertainties
     ]
@@ -70,15 +70,18 @@ def convert_raw_str_value_to_float(value):
 
 
 class RecalMeasureModel:
-    def __init__(self,  k_z, name):
+    def __init__(self,  k_z, name, u_k_z, a_u_z, b_u_z):
         # interface model
         self.parsing_output_model = lambda t, deltaP_z, deltaP_rap, deltaP_ref, temp, hr, p_atmo: RecalMeasures(convert_raw_str_value_to_float(t), convert_raw_str_value_to_float(deltaP_z), convert_raw_str_value_to_float(
             deltaP_rap), convert_raw_str_value_to_float(deltaP_ref), convert_raw_str_value_to_float(temp), convert_raw_str_value_to_float(hr), convert_raw_str_value_to_float(p_atmo))
 
         self.compute = lambda measures_to_compute: compute_recal_measures(name,
-                                                                          measures_to_compute, k_z)
+                                                                          measures_to_compute, k_z, u_k_z, a_u_z, b_u_z)
 
         # specific RecalMeasureModel fields
 
         self.k_z = k_z
         self.name = name
+        self.u_k_z = u_k_z
+        self.a_u_z = a_u_z
+        self.b_u_z = b_u_z

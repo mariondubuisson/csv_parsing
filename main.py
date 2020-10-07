@@ -10,12 +10,6 @@ from functools import reduce
 ##                          PROGRAM PARAMETERS                         ##
 #########################################################################
 
-# Correction coeff. of the reference delta P measure
-A_REF = 1
-
-# correction coeff. of the gradient delta P measure
-A_Z = 1
-
 # std of the gradient deltaP measure
 A_U_Z = 1.02E-3/2
 B_U_Z = 1.11/2
@@ -72,6 +66,9 @@ def main(args=None):
             csv_file_stream,
             RecalMeasureModel(
                 k_z=K_Z,
+                u_k_z=U_K_Z,
+                a_u_z=A_U_Z,
+                b_u_z=B_U_Z,
                 name=get_filename(csv_file_stream.name)
             )
         )
@@ -84,10 +81,6 @@ def main(args=None):
     with open(output_file, "w", newline="") as result_file:
         result_writer = csv.writer(result_file)
         result_writer.writerow(['Compute parameters'])
-        result_writer.writerow(
-            ['Correction coeff. of the reference delta P measure', 'a_REF', A_REF])
-        result_writer.writerow(
-            ['correction coeff. of the gradient delta P measure', 'a_Z', A_Z])
         result_writer.writerow(
             ['uncertaintie slope of gradient delta P measure', 'a_u_deltaP_Z', A_U_Z])
         result_writer.writerow(
