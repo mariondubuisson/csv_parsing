@@ -14,8 +14,10 @@ from functools import reduce
 A_U_Z = 1.02E-3/2
 B_U_Z = 1.11/2
 
-# Head coeff. of the Pitot reference
-K_REF = 1
+# std of the ambiant conditions measures
+U_T = 1.74
+U_HR = 0.86
+U_PATM = 86
 
 # Head coeff. of the gradient Pitot
 K_Z = 1.035
@@ -69,6 +71,9 @@ def main(args=None):
                 u_k_z=U_K_Z,
                 a_u_z=A_U_Z,
                 b_u_z=B_U_Z,
+                u_t=U_T,
+                u_hr=U_HR,
+                u_Patm=U_PATM,
                 name=get_filename(csv_file_stream.name)
             )
         )
@@ -82,11 +87,16 @@ def main(args=None):
         result_writer = csv.writer(result_file)
         result_writer.writerow(['Compute parameters'])
         result_writer.writerow(
-            ['uncertaintie slope of gradient delta P measure', 'a_u_deltaP_Z', A_U_Z])
+            ['std uncertaintie slope of gradient delta P measure', 'a_u_deltaP_Z', A_U_Z])
         result_writer.writerow(
-            ['uncertaintie y-intercept of gradient delta P measure', 'b_u_deltaP_Z', B_U_Z])
+            ['std uncertaintie y-intercept of gradient delta P measure', 'b_u_deltaP_Z', B_U_Z])
         result_writer.writerow(
-            ['Head coeff. of the Pitot reference', 'k_ref', K_REF])
+            ['std uncertaintie of temperature measure', 'u_t', U_T])
+        result_writer.writerow(
+            ['std uncertaintie of hygrometry measure', 'u_hr', U_HR])
+        result_writer.writerow(
+            ['std uncertaintie of barometric measure', 'u_Patm', U_PATM])
+
         result_writer.writerow(
             ['Head coeff. of the gradient Pitot', 'k_Z', K_Z])
         result_writer.writerow(

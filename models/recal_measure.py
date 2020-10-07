@@ -13,7 +13,7 @@ RecalProperties = namedtuple(
     'RecalProperties', ['filename', 'u_ref', 'alpha_u_ref', 'alpha_u_ref_std', 'alpha_u_rap', 'alpha_u_rap_std'])
 
 
-def compute_recal_measures(name, recal_measures, k_z, u_k_z, a_u_z, b_u_z):
+def compute_recal_measures(name, recal_measures, k_z, u_k_z, a_u_z, b_u_z, u_t, u_hr, u_Patm):
 
     # Transform raw measurements in deltaP ref, deltaP z and rho ufloats (with uncertainties)
 
@@ -24,7 +24,7 @@ def compute_recal_measures(name, recal_measures, k_z, u_k_z, a_u_z, b_u_z):
             ufloat(deltaP_rap, 0, 'deltaP_rap'),
             ufloat(deltaP_z, a_u_z * deltaP_z + b_u_z, 'deltaP_z'),
             compute_rho_with_uncertaintes(
-                temperature, hr, p_atmo, 1.74, 0.86, 86)
+                temperature, hr, p_atmo, u_t, u_hr, u_Patm)
         )
         for (t, deltaP_z, deltaP_rap, deltaP_ref, temperature, hr, p_atmo) in recal_measures
     ]
@@ -43,9 +43,6 @@ def compute_recal_measures(name, recal_measures, k_z, u_k_z, a_u_z, b_u_z):
 
     u_ref_average = np.mean(unumpy.nominal_values(
         [u_ref for (_, u_ref, _, _) in u_measures]))
-
-    u_rap_average = np.mean(unumpy.nominal_values(
-        [u_rap for (_, _, u_rap, _) in u_measures]))
 
     # Compute the alpha coefficient in speed, for each measure
 
@@ -70,13 +67,13 @@ def convert_raw_str_value_to_float(value):
 
 
 class RecalMeasureModel:
-    def __init__(self,  k_z, name, u_k_z, a_u_z, b_u_z):
+    def __init__(self,  k_z, name, u_k_z, a_u_z, b_u_z, u_t, u_hr, u_Patm):
         # interface model
         self.parsing_output_model = lambda t, deltaP_z, deltaP_rap, deltaP_ref, temp, hr, p_atmo: RecalMeasures(convert_raw_str_value_to_float(t), convert_raw_str_value_to_float(deltaP_z), convert_raw_str_value_to_float(
             deltaP_rap), convert_raw_str_value_to_float(deltaP_ref), convert_raw_str_value_to_float(temp), convert_raw_str_value_to_float(hr), convert_raw_str_value_to_float(p_atmo))
 
         self.compute = lambda measures_to_compute: compute_recal_measures(name,
-                                                                          measures_to_compute, k_z, u_k_z, a_u_z, b_u_z)
+                                                                          measures_to_compute, k_z, u_k_z, a_u_z, b_u_z, u_t, u_hr, u_Patm)
 
         # specific RecalMeasureModel fields
 
@@ -85,3 +82,6 @@ class RecalMeasureModel:
         self.u_k_z = u_k_z
         self.a_u_z = a_u_z
         self.b_u_z = b_u_z
+        self.u_t = u_t
+        self.u_hr = u_hr
+        self.u_Patm = u_Patm
